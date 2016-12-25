@@ -1,0 +1,7 @@
+#!/bin/bash
+
+user=$(whoami)
+echo " ***LOGGED IN AS: "$user""
+echo "  *** WAIT 2 minutes"
+
+echo "db_home: windows" >> /etc/nsswitch.conf

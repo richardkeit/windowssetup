@@ -11,7 +11,6 @@ Write-Host "==================`n$text`n==================`n"
 
 
 
-
 print2screen "Setting execution policy"
 Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force -Verbose
 print2screen "Install Chocolatey"
@@ -23,18 +22,66 @@ if ($chocoinstall -inotmatch "Chocolatey"){
     }
 else { print2screen "Looks to be already be installed"}
 
-$pkginstall = Get-Content -Path $PWD\choco_packages.out
 
-foreach ($pkg in $pkginstall){
 
-choco install --ignore-checksums -y $pkg
-sleep -Seconds 2 
+$basicpkg = @()
+$pkgversion = @{}
+$pkglist = Get-Content -Path $PWD\choco_packages.out
 
-print2screen "$pkg installed"
 
+
+#Loop through file and create multi-dimensional array for files with version
+print2screen "Looping through file to create a hash table to install specific versions"
+foreach ($pkg in $pkglist){
+
+        if ($pkg -match ","){
+
+            $appname = $pkg.Split(",")[0]
+            $appversion = $pkg.Split(",")[1]
+            $pkgversion.Add("$appname", "$appversion")          
+        }
+
+        else {
+
+            $basicpkg += $pkg
+        }
 }
 
 
+print2screen "These apps will install with a specific version"
+$pkgversion | Format-Table
+
+print2screen "These apps will install with the latest"
+foreach ($x in $basicpkg){Write-Host "$x"}
+
+$proceed = Read-Host -Prompt "Do you want to continue?`n(Y/N)"
+
+if ($proceed -inotmatch "y"){return}
+
+foreach ($pkg in $basicpkg){
+
+    Invoke-Command {choco install --ignore-checksums -y $pkg}
+    sleep -Seconds 2 
+
+    print2screen "$pkg installed"
+
+}
+
+foreach ($item in $pkgversion.GetEnumerator()) {
+    
+    Invoke-Command {choco install -y $($item.Name) --version $($item.Value)}
+}
+
+print2screen "Modifying cygwin to allow rsync between guest and host"
+
+Invoke-Expression .\cygwin_start_up.bat
+
+print2screen "Start vagrant"
+pushd .\vagrantbox
+print2screen "Installing vb-box plugin"
+Invoke-Expression -Command "vagrant plugin install vagrant-vbguest"
+Invoke-Expression -Command "vagrant up"
 
 
-C:\tools\cygwin\bin\cat.exe "db_home: test >> /cygdrive/etc/nsswitch.conf"
+
+
