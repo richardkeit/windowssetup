@@ -23,7 +23,18 @@ if ($chocoinstall -inotmatch "Chocolatey"){
     }
 else { print2screen "Looks to be already be installed"}
 
-Get-Content -Path $PWD\choco_packages.out
+$pkginstall = Get-Content -Path $PWD\choco_packages.out
 
-refreshenv
+foreach ($pkg in $pkginstall){
 
+choco install --ignore-checksums -y $pkg
+sleep -Seconds 2 
+
+print2screen "$pkg installed"
+
+}
+
+
+
+
+C:\tools\cygwin\bin\cat.exe "db_home: test >> /cygdrive/etc/nsswitch.conf"
