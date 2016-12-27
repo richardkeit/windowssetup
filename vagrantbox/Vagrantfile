@@ -72,10 +72,17 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-    #sudo yum -y update
+    sudo yum -y update
+	sudo cp -r /stash/vagrantbox/repo/* /etc/yum.repos.d/
     sudo yum groupinstall --nogpgcheck -y "GNOME Desktop" && sudo yum install -y python-devel.x86_64 "@Development Tools"
 	sudo ln -sf /lib/systemd/system/runlevel5.target /etc/systemd/system/default.target
 	sudo python /stash/vagrantbox/get-pip.py
 	sudo pip install ansible
+	#Install docker
+	sudo yum install -y docker-engine && sudo systemctl enable docker.service && sudo systemctl start docker
+	#Install google-chrome
+	sudo yum install -y google-chrome-stable.x86_64
+	#Install Jenkins
+	sudo wget --no-check-certificate -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo && sudo rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key && sudo yum install -y jenkins
   SHELL
 end
