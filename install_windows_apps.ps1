@@ -78,8 +78,12 @@ Invoke-Expression .\cygwin_start_up.bat
 
 print2screen "Start vagrant"
 pushd .\vagrantbox
-print2screen "Installing vb-box plugin"
-Invoke-Expression -Command "vagrant plugin install vagrant-vbguest"
+print2screen "Installing vb-box plugin and some others"
+
+$vplugins = { "micromachine" , "log4r" , "i18n" , "vagrant-vbguest"}
+foreach ($plugin in $vplugins){
+    Invoke-Expression -Command  "vagrant plugin install $plugin"
+}
 Invoke-Expression -Command "vagrant up"
 
 
