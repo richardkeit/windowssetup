@@ -88,5 +88,6 @@ Vagrant.configure("2") do |config|
 	sudo yum install -y google-chrome-stable.x86_64
 	#Install Jenkins
 	sudo wget --no-check-certificate -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo && sudo rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key && sudo yum install -y jenkins
+	sudo docker pull docker.bintray.io/jfrog/artifactory-oss
   SHELL
 end
